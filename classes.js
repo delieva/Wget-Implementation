@@ -23,7 +23,7 @@ class Request {
 
 
 class Download extends Request{
-	downld;
+	downld; //tmp
 	req;
 	download(){
 		//downloading function using request from Request class
