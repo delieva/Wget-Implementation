@@ -1,0 +1,19 @@
+{
+  "name": "wget-implementation",
+  "version": "1.0.0",
+  "description": "Implementation of utility wget",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/delieva/Wget-Implementation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/delieva/Wget-Implementation/issues"
+  },
+  "homepage": "https://github.com/delieva/Wget-Implementation#readme"
+}
