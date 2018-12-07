@@ -32,7 +32,7 @@ class Request{
 	}
 }
 
-
+ 
 class Download extends Request{
 	constructor(Url, outName, parsed){
 		super();
