@@ -32,7 +32,7 @@ class Request{
 	}
 }
 
-
+ 
 class Download extends Request{
 	constructor(Url, outName, parsed){
 		super();
@@ -65,6 +65,7 @@ class Download extends Request{
 				res.on('data', function (chunk) {
 					downloadedSize += chunk.length;
 					downld.emit('progress', downloadedSize / fileSize);
+					console.log((downloadedSize / fileSize)*100);
 					writeStream.write(chunk);
 				});
 				res.on('end', function () {
@@ -91,6 +92,7 @@ class OutputFile {
 	constructor(url, name){
 		this.url = url;
 		this.name = name;
+		
 	}
 	getUrl(){
 		return this.url;
@@ -107,6 +109,9 @@ class Parse{
 	}
 	parseUrl() {
 		let Url = url.parse(this.str);
+		if(!Url.hostname){
+			throw new URLError();
+		}
 		Url.protocol = this.cleanProtocol(Url.protocol);
 		return Url;
 	};
@@ -129,17 +134,28 @@ class Parse{
 	};
 }
 
+class URLError extends Error{
+	message(){
+		console.log("You entered wrong!");
+	}
+}
 
 
 //////test of the program////////
 
-let Url = 'http://pmit.kname.edu.ua/images/refpdf/A2009_2_Levchenko.pdf';
-let name = 'apple.jpg';  //you can set the name of the file here
+let Url = 'hskjdhfkjsh';
+let name = 'apple.html';  //you can set the name of the file here
 
 
-const outFile = new OutputFile(Url, '');
+const outFile = new OutputFile(Url, name);
 const parse = new Parse(outFile.getUrl());
 const request = new Request();
-const D = new Download(parse.parseUrl(), outFile.getName(), parse);
-
-D.wget();
+try{
+	const D = new Download(parse.parseUrl(), outFile.getName(), parse);
+	const D1 = new Download(parse.parseUrl(), name, parse);
+	D.wget();
+}
+catch (URLError) {
+	URLError.message();
+}
+//fs.unlink('apple.jpg', (e) => {if (e) console.log(e)});
