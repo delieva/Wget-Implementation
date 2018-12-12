@@ -65,8 +65,16 @@ class Download extends Request{
 				res.on('data', function (chunk) {
 					downloadedSize += chunk.length;
 					downld.emit('progress', downloadedSize / fileSize);
-					console.log((downloadedSize / fileSize)*100);
+					console.log(parseInt((downloadedSize / fileSize)*100));
 					writeStream.write(chunk);
+					setTimeout(function () {
+						res.pause();
+						console.log('There will be no additional data for 1 second.');
+						/*setTimeout(() => {
+							console.log('Now data will start flowing again.');
+							res.resume();
+						}, 4000);*/
+					}, 5000);
 				});
 				res.on('end', function () {
 					writeStream.end();
