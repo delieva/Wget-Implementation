@@ -45,6 +45,7 @@ input{
     margin-left: 15px;
     border-radius: 6px;
     height: 36px;
+    font-size: 25px;
 }
 
 #Start{
@@ -53,7 +54,7 @@ input{
     float: left;
 }
 #Pause{
-    //background: url("pause-button-png-pause-flat-button-png-512.png") 100% 100% no-repeat ;
+    /*background: url("pause-button-png-pause-flat-button-png-512.png") 100% 100% no-repeat ;*/
     width: 35px;
     height: 35px;
     background-size: 35px 35px;
@@ -63,7 +64,18 @@ input{
 }
 
 #persentOfDownloading{
-    font-size: 30px;
+    font-size: 25px;
     padding-left: 20px;
 
+}
+#persentTimeDate{
+    font-size: 25px;
+    padding-left: 20px;
+
+}
+#url{
+    width: 70%;
+}
+#name{
+    width: 30%;
 }

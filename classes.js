@@ -14,6 +14,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
 let pers = 0;
+let size;
+let flName;
 
 class Request{
 	constructor(){};
@@ -51,13 +53,14 @@ class Download extends Request{
 		}
 		else{this.outName = outName;}
 	}
-	wget(res1) {
+	wget() {
 		//downloading function using request from Request class
 		let downld;
 		let req;
 		let res;
 		let tmp = this.Url.protocol;
 		let otnm = this.outName;
+		flName = this.outName;
 		downld = new EventEmitter();
 		req = this.request({
 			protocol: tmp.trim().toLowerCase().replace(/:$/, ''),
@@ -70,13 +73,13 @@ class Download extends Request{
 			if (res.statusCode === 200) {
 				downloadedSize = 0;
 				fileSize = res.headers['content-length'];
+				size = Math.ceil((fileSize / 1024)*100)/100;
 				writeStream = fs.createWriteStream(otnm);
 				res.on('data', (chunk) => {
 					downloadedSize += chunk.length;
 					downld.emit('progress', downloadedSize / fileSize);
 					pers = parseInt((downloadedSize / fileSize)*100);
 					console.log(pers);
-					//res1.send('<p>some html</p>');
 					writeStream.write(chunk);
 					// setTimeout(function () {
 					// 	res.pause();
@@ -174,7 +177,7 @@ app.post('/public', (req, res)=>{
 app.post('/stop1', (req, res)=>{
 	console.log('bitchhhhhhh');
 	if(pers !== -1){
-		res.json({data: pers})
+		res.json({name: flName, size: size})
 	}
 	else{
 		res.json({data: "error"})

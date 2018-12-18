@@ -1,5 +1,6 @@
 const download = document.getElementById('Start');
 
+
 download.addEventListener('click', (e) => {
 	e.preventDefault();
 	console.log(document.getElementById('url').value);
@@ -13,34 +14,48 @@ download.addEventListener('click', (e) => {
 			url: document.getElementById('url').value
 		})
 	})
-		.then (res=>res.json()).then(res=>{ alert(res.error)});
+		.then (res=>res.json()).then(res=> {
+		if (res.error) {
+			alert(res.error)
+		}
+		// else {
+		// 	document.getElementById('result').innerHTML = "\""+res.name+"\"" + " downloaded. Size: " + res.size
+		// }
+		
+	})
 });
-
-
-
 
 download.addEventListener('click', (e) => {
 	e.preventDefault();
 	//setTimeout(()=>{
-		for(let i = 0; i < 10; i++){
- 			console.log('shittttt');
-			fetch('/stop1', {
-				method: 'POST',
-				headers: {"Content-Type": "application/json"},
-				credentials: 'include',
-				body: JSON.stringify({
-				})
+	setTimeout(()=>{
+		fetch('/stop1', {
+			method: 'POST',
+			headers: {"Content-Type": "application/json"},
+			credentials: 'include',
+			body: JSON.stringify({
 			})
-				.then (res=>res.json()).then(res=> {
-				if (res.data !== "error") {
-					document.getElementById('result').innerHTML = "Downloaded: " + res.data + "%"//, 5)
+		})
+			.then (res=>res.json()).then(res=> {
+			if (!res.data) {
+				if(res.size !== undefined){
+					let temp_date = new Date();
+					let day = temp_date.getDate();
+					let month = temp_date.getMonth() + 1;
+					let year = temp_date.getYear() - 100 + 2000;
+					document.getElementById('result').innerHTML = "\""+res.name+"\"" + " downloaded. Size: " + res.size + 'Kb';
+					document.getElementById('timeDate').innerHTML = "date: " + day + "." + month + "." + year + "                    time: " + temp_date.getHours() + ":" + temp_date.getMinutes() + ":" + temp_date.getSeconds()
 				}
-				else {
-					document.getElementById('result').innerHTML = "Error"
+				else{
+					document.getElementById('result').innerHTML = "\""+res.name+"\"" + " downloaded"
 				}
-			})//	}, 1000)
-		}
+			}
+			else {
+				document.getElementById('result').innerHTML = "Error"
+			}
+		})}, 1000)
 });
+
 
 
 // const button = document.getElementById('Pause');
