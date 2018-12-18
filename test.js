@@ -1,19 +1,10 @@
 'use strict'
 
-const express = require('express');
-const app = express();
-const bodyParser = require('body-parser');
-
-const http = require('http');
-const https = require('https');
-const url = require('url');
-const fs = require('fs');
-const EventEmitter = require('events').EventEmitter;
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(express.static('public'));
-let pers = 0;
+let http = require('http');
+let https = require('https');
+let url = require('url');
+let fs = require('fs');
+let EventEmitter = require('events').EventEmitter;
 
 class Request{
 	constructor(){};
@@ -42,16 +33,19 @@ class Request{
 }
 
 
-class Download extends Request{
-	constructor(Url, outName, parsed){
+class Download extends Request {
+	constructor(Url, outName, parsed) {
 		super();
 		this.Url = Url;
-		if(outName === ""){
+		if (outName === "") {
 			this.outName = parsed.setName(this.Url);
 		}
-		else{this.outName = outName;}
+		else {
+			this.outName = outName;
+		}
 	}
-	wget(res1) {
+	
+	wget() {
 		//downloading function using request from Request class
 		let downld;
 		let req;
@@ -71,22 +65,7 @@ class Download extends Request{
 				downloadedSize = 0;
 				fileSize = res.headers['content-length'];
 				writeStream = fs.createWriteStream(otnm);
-				res.on('data', (chunk) => {
-					downloadedSize += chunk.length;
-					downld.emit('progress', downloadedSize / fileSize);
-					pers = parseInt((downloadedSize / fileSize)*100);
-					console.log(pers);
-					//res1.send('<p>some html</p>');
-					writeStream.write(chunk);
-					// setTimeout(function () {
-					// 	res.pause();
-					// 	console.log('There will be no additional data for 1 second.');
-					// 	/*setTimeout(() => {
-					// 		console.log('Now data will start flowing again.');
-					// 		res.resume();
-					// 	}, 4000);*/
-					// }, 5000);
-				});
+				res.on('data', (chunk) => {this.callback()});
 				res.on('end', function () {
 					writeStream.end();
 				});
@@ -105,12 +84,28 @@ class Download extends Request{
 		
 		return downld;
 	}
+	
+	callback(chunk, downloadedSize, fileSize, writeStream) {
+		downloadedSize += chunk.length;
+		downld.emit('progress', downloadedSize / fileSize);
+		console.log((downloadedSize / fileSize) * 100);
+		writeStream.write(chunk);
+		setTimeout(function () {
+			res.pause();
+			console.log('There will be no additional data for 1 second.');
+		}, 5);
+		// setTimeout(() => {
+		// 	console.log('Now data will start flowing again.');
+		// 	res.resume();
+		// }, 10);
+		
+	}
 }
-
 class OutputFile {
 	constructor(url, name){
 		this.url = url;
 		this.name = name;
+		
 	}
 	getUrl(){
 		return this.url;
@@ -127,6 +122,9 @@ class Parse{
 	}
 	parseUrl() {
 		let Url = url.parse(this.str);
+		if(!Url.hostname){
+			throw new URLError();
+		}
 		Url.protocol = this.cleanProtocol(Url.protocol);
 		return Url;
 	};
@@ -149,38 +147,28 @@ class Parse{
 	};
 }
 
+class URLError extends Error{
+	message(){
+		console.log("You entered wrong!");
+	}
+}
 
 
 //////test of the program////////
 
-let Url = 'http://pmit.kname.edu.ua/images/refpdf/A2009_2_Levchenko.pdf';
-let name = 'bear4.pdf';  //you can set the name of the file here
+let Url = 'https://developer.mozilla.org/ru/docs/Web/JavaScript/Reference/Statements/try...catch';
+let name = 'appl.html';  //you can set the name of the file here
 
-app.post('/public', (req, res)=>{
-	console.log('bitch');
-	try {
-		const outFile = new OutputFile(req.body.url, req.body.name);
-		const parse = new Parse(outFile.getUrl());
-		const D = new Download(parse.parseUrl(), outFile.getName(), parse);
-		D.wget();
-	}
-	catch (e) {
-		pers = -1;
-		//console.log('error')
-		res.json({error: "You entered wrong information!"})
-	}
-});
 
-app.post('/stop1', (req, res)=>{
-	console.log('bitchhhhhhh');
-	if(pers !== -1){
-		res.json({data: pers})
-	}
-	else{
-		res.json({data: "error"})
-	}
-});
-
-app.listen(3000, function () {
-	console.log('Example app listening on port 3000!');
-});
+const outFile = new OutputFile(Url, name);
+const parse = new Parse(outFile.getUrl());
+const request = new Request();
+try{
+	const D = new Download(parse.parseUrl(), outFile.getName(), parse);
+	const D1 = new Download(parse.parseUrl(), name, parse);
+	D.wget();
+}
+catch (URLError) {
+	URLError.message();
+}
+//fs.unlink('apple.jpg', (e) => {if (e) console.log(e)});
