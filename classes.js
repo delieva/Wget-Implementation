@@ -53,7 +53,7 @@ class Download extends Request{
 		}
 		else{this.outName = outName;}
 	}
-	wget() {
+	wget(callback) {
 		//downloading function using request from Request class
 		let downld;
 		let req;
@@ -79,7 +79,7 @@ class Download extends Request{
 					downloadedSize += chunk.length;
 					downld.emit('progress', downloadedSize / fileSize);
 					pers = parseInt((downloadedSize / fileSize)*100);
-					console.log(pers);
+					console.log(parseInt((downloadedSize / fileSize)*100));
 					writeStream.write(chunk);
 					// setTimeout(function () {
 					// 	res.pause();
@@ -99,6 +99,7 @@ class Download extends Request{
 			} else {
 				downld.emit('error', 'Server respond ' + res.statusCode);
 			}
+			callback();
 		});
 		
 		req.end();
@@ -156,31 +157,17 @@ class Parse{
 
 //////test of the program////////
 
-let Url = 'http://pmit.kname.edu.ua/images/refpdf/A2009_2_Levchenko.pdf';
-let name = 'bear4.pdf';  //you can set the name of the file here
-
-app.post('/public', (req, res)=>{
+app.post('/public', (req1, res1)=>{
 	console.log('bitch');
 	try {
-		const outFile = new OutputFile(req.body.url, req.body.name);
+		const outFile = new OutputFile(req1.body.url, req1.body.name);
 		const parse = new Parse(outFile.getUrl());
 		const D = new Download(parse.parseUrl(), outFile.getName(), parse);
-		D.wget();
+		D.wget(() => {res1.json({name: flName, size: size})});
 	}
 	catch (e) {
 		pers = -1;
-		//console.log('error')
-		res.json({error: "You entered wrong information!"})
-	}
-});
-
-app.post('/stop1', (req, res)=>{
-	console.log('bitchhhhhhh');
-	if(pers !== -1){
-		res.json({name: flName, size: size})
-	}
-	else{
-		res.json({data: "error"})
+		res1.json({error: "You entered wrong information!"})
 	}
 });
 
