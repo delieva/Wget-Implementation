@@ -127,3 +127,15 @@ h1 {
     font-weight: bold;
     font-size: 27px;
 }
+#informationAbout{
+    width:70% ;
+    margin-left: 15%;
+    font-size: 30px;
+
+}
+a{
+    text-decoration: none;
+    color: white;
+}
+
+
