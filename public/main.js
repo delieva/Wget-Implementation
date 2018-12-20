@@ -25,6 +25,10 @@ download.addEventListener('click', (e) => {
 				let year = temp_date.getYear() - 100 + 2000;
 				document.getElementById('result').innerHTML = "\""+res.name+"\"" + " downloaded," +" size: "+ res.size+"Kb";
 				document.getElementById('timeDate').innerHTML = "date: " + day + "." + month + "." + year + "   time: " + temp_date.getHours() + ":" + temp_date.getMinutes() + ":" + temp_date.getSeconds()
+				for(let i = 0; i< res.keys.length; i++){
+					document.getElementById('result').innerHTML += "  "+res.keys[i];
+				}
+			
 			}
 			else{
 
@@ -39,3 +43,5 @@ download.addEventListener('click', (e) => {
 		
 	})
 });
+
+

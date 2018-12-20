@@ -3,7 +3,7 @@
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
-//let json = require('jsonfile');
+let OutJ = require('./OutJSON');
 
 const http = require('http');
 const https = require('https');
@@ -11,13 +11,14 @@ const url = require('url');
 const fs = require('fs');
 const EventEmitter = require('events').EventEmitter;
 
+let keys;
+let size;
+let flName;
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
-let pers = 0;
-let size;
-let flName;
 
 class Request{
 	constructor(){};
@@ -47,15 +48,16 @@ class Request{
 
 
 class Download extends Request{
-	constructor(Url, outName, parsed){
+	constructor(Url, outName, parsed, heap){
 		super();
 		this.Url = Url;
+		this.heap = heap;
 		if(outName === ""){
 			this.outName = parsed.setName(this.Url);
 		}
 		else{this.outName = outName;}
 		let n = this.outName;
-		this.outName = outJson.check(n, names);
+		this.outName = outJson.check(n, this.heap);
 		console.log('im first')
 		
 	}
@@ -79,23 +81,14 @@ class Download extends Request{
 			if (res.statusCode === 200) {
 				downloadedSize = 0;
 				fileSize = res.headers['content-length'];
-				this.outJson.appendData({[flName] : 0});
+				//outJson.appendData({[flName] : 1});
 				size = Math.ceil((fileSize / 1024)*100)/100;
 				writeStream = fs.createWriteStream(otnm);
 				res.on('data', (chunk) => {
 					downloadedSize += chunk.length;
 					downld.emit('progress', downloadedSize / fileSize);
-					pers = parseInt((downloadedSize / fileSize)*100);
 					console.log(parseInt((downloadedSize / fileSize)*100));
 					writeStream.write(chunk);
-					// setTimeout(function () {
-					// 	res.pause();
-					// 	console.log('There will be no additional data for 1 second.');
-					// 	/*setTimeout(() => {
-					// 		console.log('Now data will start flowing again.');
-					// 		res.resume();
-					// 	}, 4000);*/
-					// }, 5000);
 				});
 				res.on('end', function () {
 					writeStream.end();
@@ -106,6 +99,7 @@ class Download extends Request{
 			} else {
 				downld.emit('error', 'Server respond ' + res.statusCode);
 			}
+			keys = outJson.showDownloaded();
 			callback();
 		});
 		
@@ -130,70 +124,6 @@ class OutputFile {
 		return this.name;
 	}
 	
-}
-
-class OutJSON{
-	constructor(jsonfile){
-		this.jsonfile = jsonfile;
-		this.obj = {
-			table: []
-		};
-	}
-	appendData(names){
-		fs.readFile(this.jsonfile, 'utf8', (err, data)=>{
-			if (err){
-				console.log(err);
-			} else {
-				this.obj = JSON.parse(data); //now it an object
-				this.obj.table.push(names); //add some data
-			}
-			fs.writeFile(this.jsonfile, JSON.stringify(this.obj), 'utf8');
-		})
-	}
-	check(name, data){
-		console.log('slfkdj111111')
-		// fs.readFile('docs.json', 'utf8', (err, data)=>{
-		// 	console.log('slfkdj')
-		// 	if (err){
-		// 		console.log(err);
-		// 	} else {
-		// 		console.log('lsllalalalla')
-		// 		this.obj = JSON.parse(data); //now it an object
-		// 		if(this.obj.table.name){
-		// 			this.obj.table.name += 1;
-		// 			fs.writeFile('docs.json', JSON.stringify(this.obj), 'utf8');
-		// 			let a = name.lastIndexOf(".");
-		// 			//name = name.substr(0, a) + "(" + this.obj.table.name + ")" + name.substr(a+1, name.length);
-		// 			console.log(name);
-		// 			return name;
-		// 		}
-		// 		else{
-		// 			return name;
-		// 		}
-		// 	}
-		// })
-		if(data.table.name){
-			data.table.name += 1;
-			let a = name.lastIndexOf(".");
-			name = name.substr(0, a) + "(" + this.obj.table.name + ")" + name.substr(a+1, name.length);
-			console.log(name);
-			//fs.writeFile('docs.json', JSON.stringify(this.obj), 'utf8');
-			return name;
-		}
-	}
-	getData(){
-		fs.readFile('docs.json', 'utf8', (err, data)=>{
-			console.log('11111')
-			if (err){
-				console.log(err);
-			} else {
-				this.obj = JSON.parse(data); //now it an object
-				console.log(this.obj)
-				let a = this.obj;
-				return a;
-			}
-		})
-	}
 }
 
 class Parse{
@@ -224,29 +154,83 @@ class Parse{
 	};
 }
 
+class OutJSON{
+	constructor(jsonfile){
+		this.jsonfile = jsonfile;
+		this.obj = {
+			table: [{fuck: "shit"}]
+		};
+	}
+	check(name, data){
+		console.log("hello" +data);
+		for(let i = 0; i < data.table.length; i++){
+			console.log('mamaMia')
+			for (let key in data.table[i]){
+				if(key === name){
+					console.log('ohhh')
+					this.obj.table[i][key] += 1;
+					let a = name.lastIndexOf(".");
+					name = name.substr(0, a) + "(" + this.obj.table[i][key] + ")" + name.substr(a, name.length);
+					console.log(name);
+					fs.writeFile('docs.json', JSON.stringify(this.obj), 'utf8');
+					return name;
+				}
+			}
+		}
+		
+	}
+	showDownloaded(){
+		console.log("hello");
+		let k = [];
+		for (let i = 0; i < this.obj.table.length; i++){
+			for (let key in this.obj.table[i]) {
+				console.log(this.obj.table[i][key]);
+				console.log(key);
+				k.push(key);
+			}
+		}
+		console.log(k);
+		return k;
+		
+	}
+	getData(){
+		// fs.readFile('docs.json', 'utf8', (err, data)=>{
+		// 	if (err){
+		// 		console.log(err);
+		// 	} else {
+		// 		this.obj = JSON.parse(data); //now it an object
+		// 		console.log(JSON.parse(data))
+		// 		this.obj = this.obj
+		// 		}
+		// 	})
+		this.obj = JSON.parse(fs.readFileSync("docs.json"))
+		return JSON.parse(fs.readFileSync("docs.json"));
+	}
+}
 
 
 //////test of the program////////
 
-let outJson = new OutJSON('docs.json');
-let names = outJson.getData();
-console.log(names)
+let outJson = new OutJSON('docs.json', {});
+let heap = outJson.getData();
+console.log(heap);
+
 
 
 app.post('/public', (req1, res1)=>{
 	console.log('bitch');
-	//try {
-			console.log(names)
+	try {
+		let outJson = new OutJSON('docs.json', {});
+		let heap = outJson.getData();
 			const outFile = new OutputFile(req1.body.url, req1.body.name);
 			const parse = new Parse(outFile.getUrl());
-			const D = new Download(parse.parseUrl(), outFile.getName(), parse);
-			D.wget(() => {res1.json({name: flName, size: size})});
+			const D = new Download(parse.parseUrl(), outFile.getName(), parse, heap);
+			D.wget(() => {res1.json({name: flName, size: size, keys: keys})});
 		
-	//}
-	// catch (e) {
-	// 	pers = -1;
-	// 	res1.json({error: "You entered wrong information!"})
-	// }
+	}
+	catch (e) {
+		res1.json({error: "You entered wrong information!"})
+	}
 });
 
 app.listen(3000, function () {
