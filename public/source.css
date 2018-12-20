@@ -83,3 +83,47 @@ input{
     height: 640px;
     width: 480px;
 }
+#vladaPhoto{
+    height: 640px;
+    width: 480px;
+}
+
+h1 {
+    text-align: center;
+}
+
+#Vlada{
+    margin-left: 40px;
+    text-align: left;
+    width: 45%;
+    float: left;
+}
+#Sasha{
+    float: right;
+    margin-right: 40px;
+    text-align: right;
+    width: 45%;
+}
+
+#sashaDisc{
+    margin-right: 10px;
+    text-align: right;
+    width: 100%;
+    font-size: 25px;
+}
+#vladaDisc{
+    margin-left: 10px;
+    text-align: left;
+    width: 100%;
+    font-size: 25px;
+}
+#vladaName{
+    width: 100%;
+    font-weight: bold;
+    font-size: 27px;
+}
+#sashaName{
+    width: 100%;
+    font-weight: bold;
+    font-size: 27px;
+}
