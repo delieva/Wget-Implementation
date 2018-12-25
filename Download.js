@@ -29,6 +29,7 @@ class Download extends Reqst.Request{
 		let otnm = this.outName;
 		let size;
 		downld = new EventEmitter();
+
 		req = this.request({
 			protocol: tmp.trim().toLowerCase().replace(/:$/, ''),
 			host: this.Url.hostname,
@@ -56,9 +57,10 @@ class Download extends Reqst.Request{
 					downld.emit('end', otnm);
 				});
 			} else {
-				downld.emit('error', 'Server respond ' + res.statusCode);
+				return callback(new Error("error"), this.outName, size);
 			}
-			callback(this.outName, size);
+
+			callback(null, this.outName, size);
 		});
 		
 		req.end();
