@@ -3,7 +3,7 @@ const download = document.getElementById('Start');
 download.addEventListener('click', (e) => {
 	e.preventDefault();
 	console.log(document.getElementById('url').value);
-	console.log('shit');
+	//console.log('shit');
 	fetch('/public', {
 		method: 'POST',
 		headers: {"Content-Type": "application/json"},
@@ -42,6 +42,10 @@ download.addEventListener('click', (e) => {
 		}
 		
 	})
+		.catch(e=>{
+			alert("Error")
+		})
+
 });
 
 
