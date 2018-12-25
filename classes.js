@@ -25,7 +25,11 @@ app.post('/public', (req1, res1)=>{
 		res1.json({error: "You entered wrong information!"})
 	}
 });
-
+app.post('/downloaded', (req, res)=>{
+		let outJson = new OutJ.OutJSON('docs.json');
+		let moon = outJson.getData();
+		res.json({keys: outJson.showDownloaded()});
+});
 app.listen(3000, function () {
 	console.log('Example app listening on port 3000!');
 });
